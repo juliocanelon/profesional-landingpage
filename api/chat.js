@@ -1,10 +1,10 @@
-// Si usas Next.js, crea: /pages/api/chat.js
-// Si usas Vercel sin Next, crea: /api/chat.js
+// pages/api/chat.js
 
 import { skills }    from '../src/data/skills.js';
 import { education } from '../src/data/education.js';
 import { projects }  from '../src/data/projects.js';
 import { contact }   from '../src/data/contact.js';
+import { profileJulio } from '../src/data/profile-julio.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -16,34 +16,80 @@ export default async function handler(req, res) {
   if (typeof prompt !== 'string') {
     return res.status(400).json({ error: 'Invalid request' });
   }
-
   if (!process.env.OPENAI_API_KEY) {
     return res.status(500).json({ error: 'Missing OPENAI_API_KEY' });
   }
 
-  // Armar la KB
   const kbLines = [];
+
+  // Habilidades
   kbLines.push('=== HABILIDADES ===');
   for (const [cat, items] of Object.entries(skills)) {
     kbLines.push(`${cat}: ${items.join(', ')}`);
   }
+
+  // Educación
   kbLines.push('\n=== EDUCACIÓN ===');
   education.forEach((e) => kbLines.push('- ' + e));
+
+  // Proyectos
   kbLines.push('\n=== PROYECTOS ===');
   projects.forEach((p) =>
     kbLines.push(`- ${p.title} (${p.role}): ${p.description}`)
   );
+
+  // Experiencia Profesional
+  kbLines.push('\n=== EXPERIENCIA PROFESIONAL ===');
+  profileJulio.experience.forEach((e) => {
+    kbLines.push(
+      `- ${e.role} en ${e.company} (${e.start} - ${e.end}, ${e.duration}) – ${e.location}: ${e.description}`
+    );
+  });
+
+  // Contacto
   kbLines.push('\n=== CONTACTO ===');
   kbLines.push(`Email: ${contact.email}`);
   kbLines.push(`LinkedIn: ${contact.linkedin}`);
   kbLines.push(`GitHub: ${contact.github}`);
 
+  // Experiencia Académica
+  kbLines.push('\n=== EXPERIENCIA ACADÉMICA ===');
+  profileJulio.academicExperience.forEach((a) => {
+    kbLines.push(
+      `- ${a.role} en ${a.institution} (${a.start} - ${a.end}): ${a.description}`
+    );
+  });
+
+  // Perfil Unificado (resumen, títulos, idiomas, certificaciones…)
+  kbLines.push('\n=== PERFIL COMPLETO ===');
+  kbLines.push(`Nombre: ${profileJulio.name}`);
+  kbLines.push(`Título: ${profileJulio.title}`);
+  kbLines.push(`Ubicación: ${profileJulio.location}`);
+  kbLines.push(`Resumen: ${profileJulio.summary}`);
+  if (Array.isArray(profileJulio.titles)) {
+    kbLines.push(`Cargos / Roles: ${profileJulio.titles.join(', ')}`);
+  }
+  if (profileJulio.languages) {
+    const langs = Object.entries(profileJulio.languages)
+      .map(([lang, lvl]) => `${lang}: ${lvl}`)
+      .join('; ');
+    kbLines.push(`Idiomas: ${langs}`);
+  }
+  if (Array.isArray(profileJulio.certifications)) {
+    kbLines.push(`Certificaciones: ${profileJulio.certifications.join(', ')}`);
+  }
+  if (Array.isArray(profileJulio.awards)) {
+    kbLines.push(`Premios y Reconocimientos: ${profileJulio.awards.join(', ')}`);
+  }
+  if (Array.isArray(profileJulio.publications)) {
+    kbLines.push(`Publicaciones / Hobbies: ${profileJulio.publications.join(', ')}`);
+  }
+
   const systemPrompt = `
 Eres "Chatbot Julio Canelon IA".  
 Solo puedes usar la siguiente información para responder.  
-No inventes ni supongas nada.
+No inventes ni supongas nada.  
 Responde de forma clara y concisa.  
-No uses emojis ni lenguaje informal.
 Si te preguntan algo que no esté en estos datos, responde:  
 "Lo siento, no dispongo de esa información."  
 
