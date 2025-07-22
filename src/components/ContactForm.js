@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import SectionTitle from './SectionTitle';
 import { contact } from '../data/contact';
 import { FaEnvelope, FaLinkedin, FaGithub } from 'react-icons/fa';
-import emailjs from 'emailjs-com';
 
 function ContactForm() {
   const [values, setValues] = useState({
