@@ -1,3 +1,5 @@
+// src/components/ChatBot.js
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Button, Form, InputGroup } from 'react-bootstrap';
 import { FaComments, FaPaperPlane } from 'react-icons/fa';
@@ -56,6 +58,7 @@ export default function ChatBot() {
     <>
       {/* Botón flotante para abrir el chat */}
       <Button
+        id="open-chatbot-button"          // ← Agregado aquí
         variant="primary"
         onClick={handleShow}
         style={{
