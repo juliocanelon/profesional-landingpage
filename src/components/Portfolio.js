@@ -39,9 +39,10 @@ function Portfolio() {
                         variant={isFeatured ? 'light' : 'primary'}
                         size="sm"
                         href={p.links.github}
+                        target="_blank"
                         className="me-2"
                       >
-                        GitHub
+                        +Info
                       </Button>
                     )}
                     {p.links.demo && (

@@ -1,8 +1,16 @@
 export const projects = [
 {
+    title: 'Diseño y desarrollo de proyecto FoodieBot AI',
+    role: 'Líder Técnico (Asignatura: Ingeniería de Software)',
+    date: 'junio de 2025 - presente',
+    description: 'Diseño e implementación de un agente de IA conversacional en WhatsApp para automatizar la gestión de pedidos online, integrándolo con una plataforma web de menús. Configuración de pipeline CI/CD, dashboard de estadísticas y punto de intervención humana en tiempo real-',
+    tech: ' Node.js, Python (FastAPI), OpenAI GPT‑4, WhatsApp Business API, MongoDB, React, Chart.js, Docker, AWS, GitHub Actions',
+    links: { github: 'https://sites.google.com/view/foodieaibot/inicio', demo: null },
+  },
+{
     title: 'Integración de modelo LLM en el proceso de desarrollo y despliegue contínuo',
     role: 'Líder Técnico (Scotiabank Chile)',
-    date: 'marzo de 2025 - presente (2 años 7 meses)',
+    date: 'marzo de 2025 - presente',
     description: 'Diseño de soluciones donde se integra un modelo LLM para la resolución de vulnerabilidades de seguridad en código fuente legado. Implementación de un pipeline de CI/CD que utiliza el modelo LLM para analizar y sugerir correcciones en el código, mejorando la seguridad y eficiencia del proceso de desarrollo.',
     tech: 'Gemini CLI, GitHub Actions, Docker, Kubernetes',
     links: { github: null, demo: null },
