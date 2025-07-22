@@ -4,7 +4,7 @@ import { skills }    from '../src/data/skills.js';
 import { education } from '../src/data/education.js';
 import { projects }  from '../src/data/projects.js';
 import { contact }   from '../src/data/contact.js';
-import { profileJulio } from '../src/data/profile-julio.js';  
+import { profileJulio } from '../src/data/profile-julio.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -16,12 +16,10 @@ export default async function handler(req, res) {
   if (typeof prompt !== 'string') {
     return res.status(400).json({ error: 'Invalid request' });
   }
-
   if (!process.env.OPENAI_API_KEY) {
     return res.status(500).json({ error: 'Missing OPENAI_API_KEY' });
   }
 
-  // Construir la KB
   const kbLines = [];
 
   // Habilidades
@@ -40,13 +38,29 @@ export default async function handler(req, res) {
     kbLines.push(`- ${p.title} (${p.role}): ${p.description}`)
   );
 
+  // Experiencia Profesional
+  kbLines.push('\n=== EXPERIENCIA PROFESIONAL ===');
+  profileJulio.experience.forEach((e) => {
+    kbLines.push(
+      `- ${e.role} en ${e.company} (${e.start} - ${e.end}, ${e.duration}) – ${e.location}: ${e.description}`
+    );
+  });
+
   // Contacto
   kbLines.push('\n=== CONTACTO ===');
   kbLines.push(`Email: ${contact.email}`);
   kbLines.push(`LinkedIn: ${contact.linkedin}`);
   kbLines.push(`GitHub: ${contact.github}`);
 
-  // Perfil unificado
+  // Experiencia Académica
+  kbLines.push('\n=== EXPERIENCIA ACADÉMICA ===');
+  profileJulio.academicExperience.forEach((a) => {
+    kbLines.push(
+      `- ${a.role} en ${a.institution} (${a.start} - ${a.end}): ${a.description}`
+    );
+  });
+
+  // Perfil Unificado (resumen, títulos, idiomas, certificaciones…)
   kbLines.push('\n=== PERFIL COMPLETO ===');
   kbLines.push(`Nombre: ${profileJulio.name}`);
   kbLines.push(`Título: ${profileJulio.title}`);
@@ -69,15 +83,6 @@ export default async function handler(req, res) {
   }
   if (Array.isArray(profileJulio.publications)) {
     kbLines.push(`Publicaciones / Hobbies: ${profileJulio.publications.join(', ')}`);
-  }
-  if (Array.isArray(profileJulio.experience)) {
-    kbLines.push(`Experiencia profesional: ${profileJulio.experience.join(', ')}`);
-  }
-  if (Array.isArray(profileJulio.academicExperience)) {
-    kbLines.push(`Experiencia academica: ${profileJulio.academicExperience.join(', ')}`);
-  }
-  if (Array.isArray(profileJulio.talks)) {
-    kbLines.push(`Charlas y ponencias: ${profileJulio.talks.join(', ')}`);
   }
 
   const systemPrompt = `
