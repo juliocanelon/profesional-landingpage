@@ -7,6 +7,12 @@ cd landing-page
 npm install
 ```
 
+Crea un archivo `.env.local` en la raíz con tu clave de OpenAI:
+
+```bash
+OPENAI_API_KEY=TU_API_KEY_AQUI
+```
+
 ## Desarrollo
 ```bash
 npm start

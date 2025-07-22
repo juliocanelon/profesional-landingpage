@@ -7,6 +7,7 @@ import Skills from './components/Skills';
 import Portfolio from './components/Portfolio';
 import Education from './components/Education';
 import ContactForm from './components/ContactForm';
+import ChatBot from './components/ChatBot';
 import Footer from './components/Footer';
 import './styles/globals.css';
 import './styles/variables.scss';
@@ -34,6 +35,7 @@ function App() {
         <Portfolio />
         <Education />
         <ContactForm />
+        <ChatBot />
       </main>
       <Footer />
     </Router>
