@@ -4,6 +4,7 @@ function ChatBot() {
   const [messages, setMessages] = useState([]); // { role, text }
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -12,6 +13,7 @@ function ChatBot() {
     const userMsg = { role: 'user', text: input };
     setMessages((msgs) => [...msgs, userMsg]);
     setLoading(true);
+    setError(null);
 
     try {
       const res = await fetch('/api/chat', {
@@ -20,11 +22,17 @@ function ChatBot() {
         body: JSON.stringify({ prompt: input })
       });
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Server Error');
+      }
+
       if (data.reply) {
         setMessages((msgs) => [...msgs, { role: 'assistant', text: data.reply }]);
       }
     } catch (err) {
       console.error(err);
+      setError(err.message);
     } finally {
       setLoading(false);
       setInput('');
@@ -41,6 +49,7 @@ function ChatBot() {
               {msg.text}
             </div>
           ))}
+          {error && <div className="msg error">Error: {error}</div>}
         </div>
         <form onSubmit={handleSubmit}>
           <input

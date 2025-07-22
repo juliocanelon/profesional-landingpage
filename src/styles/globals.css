@@ -39,6 +39,10 @@ body {
 .msg.bot {
   background: #f1f1f1;
 }
+.msg.error {
+  background: #ffe5e5;
+  color: #b00020;
+}
 form {
   display: flex;
   gap: .5rem;
