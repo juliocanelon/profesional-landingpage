@@ -1,0 +1,24 @@
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+.dark {
+  --bs-body-bg: #0F172A;
+  --bs-body-color: #F1F5F9;
+}
+.back-to-top {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 1000;
+}
+.timeline li::before {
+  content: '\2022';
+  color: var(--bs-primary);
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}

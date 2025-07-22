@@ -1,2 +1,24 @@
-# profesional-landingpage
-Profesional landing page en react y bootstrap 5.3
+# Landing Page de Julio C. Canelón
+
+## Instalación
+```bash
+git clone <repo-url>
+cd landing-page
+npm install
+```
+
+## Desarrollo
+```bash
+npm start
+```
+
+## Build
+```bash
+npm run build
+```
+
+## Deploy en Vercel
+1. Importa el repo en Vercel.
+2. Framework: Create React App.
+3. Build Command: `npm run build`.
+4. Output Directory: `build`.
