@@ -1,19 +1,20 @@
-// src/components/ChatBot.js
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Button, Form, InputGroup } from 'react-bootstrap';
 import { FaComments, FaPaperPlane } from 'react-icons/fa';
 
 export default function ChatBot() {
-  const [messages, setMessages] = useState([]);          // { role, text }
-  const [input, setInput]       = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState(null);
-  const [show, setShow]         = useState(false);
-  const scrollRef               = useRef(null);
+  const [messages, setMessages]         = useState([]);          // { role, text }
+  const [input, setInput]               = useState('');
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState(null);
+  const [show, setShow]                 = useState(false);
+  const [remaining, setRemaining]       = useState(10);          // contador de preguntas
+  const scrollRef                       = useRef(null);
 
   const handleShow  = () => setShow(true);
   const handleClose = () => setShow(false);
 
+  // Scroll al fondo cuando llegan mensajes
   useEffect(() => {
     if (show && scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -22,13 +23,14 @@ export default function ChatBot() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || remaining <= 0) return;
 
-    // Mensaje de usuario
+    // Agrega el mensaje del usuario
     setMessages((m) => [...m, { role: 'user', text: input }]);
     setLoading(true);
     setError(null);
     setInput('');
+    setRemaining((r) => r - 1);  // decrementa el contador
 
     try {
       const res = await fetch('/api/chat', {
@@ -52,6 +54,7 @@ export default function ChatBot() {
 
   return (
     <>
+      {/* Botón flotante para abrir el chat */}
       <Button
         variant="primary"
         onClick={handleShow}
@@ -72,6 +75,7 @@ export default function ChatBot() {
         <FaComments size={24} />
       </Button>
 
+      {/* Modal del chatbot */}
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
           <Modal.Title>Chatbot Julio Canelon IA</Modal.Title>
@@ -81,6 +85,12 @@ export default function ChatBot() {
           ref={scrollRef}
           style={{ maxHeight: '60vh', overflowY: 'auto', padding: '1rem' }}
         >
+          {/* Contador de preguntas */}
+          <div className="mb-2 text-end text-muted">
+            Preguntas restantes: {remaining}
+          </div>
+
+          {/* Mensaje de bienvenida */}
           {messages.length === 0 && (
             <div className="mb-3">
               <div className="p-2 rounded bg-light text-dark">
@@ -89,6 +99,7 @@ export default function ChatBot() {
             </div>
           )}
 
+          {/* Conversación */}
           {messages.map((msg, i) => (
             <div
               key={i}
@@ -114,12 +125,20 @@ export default function ChatBot() {
           <Form onSubmit={handleSubmit} className="w-100">
             <InputGroup>
               <Form.Control
-                placeholder="Escribe tu mensaje..."
+                placeholder={
+                  remaining > 0
+                    ? 'Escribe tu mensaje...'
+                    : 'Límite de preguntas alcanzado'
+                }
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                disabled={loading}
+                disabled={loading || remaining <= 0}
               />
-              <Button variant="primary" type="submit" disabled={loading || !input.trim()}>
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={loading || !input.trim() || remaining <= 0}
+              >
                 <FaPaperPlane />
               </Button>
             </InputGroup>
