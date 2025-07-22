@@ -1,101 +1,68 @@
-// pages/api/chat.js
+import React, { useState } from 'react';
 
-import { skills } from '../data/skills.js';
-import { education } from '../data/education.js';
-import { projects } from '../data/projects.js';
-import { contact } from '../data/contact.js';
+function ChatBot() {
+  const [messages, setMessages] = useState([]); // { role, text }
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
 
-  // Leer el prompt del body
-  let body = '';
-  for await (const chunk of req) {
-    body += chunk;
-  }
-  let prompt;
-  try {
-    ({ prompt } = JSON.parse(body || '{}'));
-  } catch {
-    return res.status(400).json({ error: 'Invalid JSON' });
-  }
+    const userMsg = { role: 'user', text: input };
+    setMessages((msgs) => [...msgs, userMsg]);
+    setLoading(true);
+    setError(null);
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Missing OPENAI_API_KEY' });
-  }
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: input })
+      });
+      const data = await res.json();
 
-  // Construye la KB a partir de tus datos
-  function buildKnowledgeBase() {
-    const lines = [];
+      if (!res.ok) {
+        throw new Error(data.error || 'Server Error');
+      }
 
-    lines.push('=== HABILIDADES ===');
-    Object.entries(skills).forEach(([category, items]) => {
-      lines.push(`${category}: ${items.join(', ')}`);
-    });
-
-    lines.push('\n=== EDUCACIÓN ===');
-    education.forEach((entry) => {
-      lines.push(`- ${entry}`);
-    });
-
-    lines.push('\n=== PROYECTOS ===');
-    projects.forEach((p) => {
-      lines.push(`- ${p.title} (${p.role}): ${p.description}`);
-    });
-
-    lines.push('\n=== CONTACTO ===');
-    lines.push(`Email: ${contact.email}`);
-    lines.push(`LinkedIn: ${contact.linkedin}`);
-    lines.push(`GitHub: ${contact.github}`);
-
-    return lines.join('\n');
-  }
-
-  const knowledgeBase = buildKnowledgeBase();
-
-  // Mensajes para OpenAI: primero el sistema con la KB, luego el usuario
-  const messages = [
-    {
-      role: 'system',
-      content: `
-Eres "Chatbot Julio Canelon IA".  
-Sólo puedes usar la siguiente información para responder.  
-Si la pregunta no está en estos datos, responde: "Lo siento, no dispongo de esa información."  
-
-${knowledgeBase}
-      `.trim()
-    },
-    { role: 'user', content: prompt }
-  ];
-
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages,
-        temperature: 0
-      }),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(errText);
+      if (data.reply) {
+        setMessages((msgs) => [...msgs, { role: 'assistant', text: data.reply }]);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      setInput('');
     }
+  };
 
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || '';
-    return res.status(200).json({ reply });
-  } catch (error) {
-    console.error('OpenAI error:', error);
-    return res.status(500).json({ error: error.message || 'Server error' });
-  }
+  return (
+    <section className="py-5">
+      <div className="container">
+        <h2 className="my-4 text-center">ChatBot</h2>
+        <div className="chat-window">
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`msg ${msg.role === 'user' ? 'user' : 'bot'}`}>
+              {msg.text}
+            </div>
+          ))}
+          {error && <div className="msg error">Error: {error}</div>}
+        </div>
+        <form onSubmit={handleSubmit}>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            disabled={loading}
+            placeholder="Escribe tu mensaje..."
+          />
+          <button type="submit" disabled={loading || !input.trim()}>Enviar</button>
+        </form>
+      </div>
+    </section>
+  );
 }
+
+export default ChatBot;
