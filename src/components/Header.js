@@ -15,7 +15,6 @@ function Header({ dark, onToggle }) {
             <Nav.Link href="#habilidades">Habilidades</Nav.Link>
             <Nav.Link href="#educacion">Educación</Nav.Link>
             <Nav.Link href="#contacto">Contacto</Nav.Link>
-            <ThemeToggle dark={dark} onToggle={onToggle} />
           </Nav>
         </Navbar.Collapse>
       </div>
