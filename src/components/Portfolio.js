@@ -9,27 +9,55 @@ function Portfolio() {
       <div className="container">
         <SectionTitle title="Portafolio" />
         <div className="row">
-          {projects.map((p) => (
-            <div key={p.title} className="col-lg-4 col-md-6 mb-4">
-              <Card className="h-100">
-                <Card.Body>
-                  <Card.Title>{p.title}</Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">{p.role}</Card.Subtitle>
-                  <Card.Text>{p.description}</Card.Text>
-                  <Card.Text><strong>Fecha:</strong> {p.date}</Card.Text>
-                </Card.Body>
-                <Card.Footer>
-                  <p><strong>Tecnologías:</strong> {p.tech}</p>
-                  {p.links.github && (
-                    <Button variant="primary" size="sm" href={p.links.github} className="me-2">GitHub</Button>
-                  )}
-                  {p.links.demo && (
-                    <Button variant="success" size="sm" href={p.links.demo}>Demo</Button>
-                  )}
-                </Card.Footer>
-              </Card>
-            </div>
-          ))}
+          {projects.map((p, index) => {
+            const isFeatured = index < 3;
+            return (
+              <div key={p.title} className="col-lg-4 col-md-6 mb-4">
+                <Card
+                  className="h-100"
+                  bg={isFeatured ? 'primary' : undefined}
+                  text={isFeatured ? 'white' : undefined}
+                >
+                  <Card.Body>
+                    <Card.Title>{p.title}</Card.Title>
+                    <Card.Subtitle className="mb-2">
+                      {p.role}
+                    </Card.Subtitle>
+                    <Card.Text>{p.description}</Card.Text>
+                    <Card.Text>
+                      <strong>Fecha:</strong> {p.date}
+                    </Card.Text>
+                  </Card.Body>
+                  <Card.Footer
+                    className={isFeatured ? 'bg-primary border-primary' : undefined}
+                  >
+                    <p className={isFeatured ? 'text-white' : undefined}>
+                      <strong>Tecnologías:</strong> {p.tech}
+                    </p>
+                    {p.links.github && (
+                      <Button
+                        variant={isFeatured ? 'light' : 'primary'}
+                        size="sm"
+                        href={p.links.github}
+                        className="me-2"
+                      >
+                        GitHub
+                      </Button>
+                    )}
+                    {p.links.demo && (
+                      <Button
+                        variant={isFeatured ? 'light' : 'success'}
+                        size="sm"
+                        href={p.links.demo}
+                      >
+                        Demo
+                      </Button>
+                    )}
+                  </Card.Footer>
+                </Card>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

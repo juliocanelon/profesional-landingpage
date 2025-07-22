@@ -1,4 +1,12 @@
 export const projects = [
+{
+    title: 'Integración de modelo LLM en el proceso de desarrollo y despliegue contínuo',
+    role: 'Líder Técnico (Scotiabank Chile)',
+    date: 'marzo de 2025 - presente (2 años 7 meses)',
+    description: 'Diseño de soluciones donde se integra un modelo LLM para la resolución de vulnerabilidades de seguridad en código fuente legado. Implementación de un pipeline de CI/CD que utiliza el modelo LLM para analizar y sugerir correcciones en el código, mejorando la seguridad y eficiencia del proceso de desarrollo.',
+    tech: 'Gemini CLI, GitHub Actions, Docker, Kubernetes',
+    links: { github: null, demo: null },
+  },
   {
     title: 'Soluciones Bancarias Digitales',
     role: 'Líder Técnico (Scotiabank Chile)',
