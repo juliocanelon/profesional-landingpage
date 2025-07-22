@@ -16,9 +16,10 @@ function Portfolio() {
                   <Card.Title>{p.title}</Card.Title>
                   <Card.Subtitle className="mb-2 text-muted">{p.role}</Card.Subtitle>
                   <Card.Text>{p.description}</Card.Text>
-                  <p><strong>Tecnologías:</strong> {p.tech}</p>
+                  <Card.Text><strong>Fecha:</strong> {p.date}</Card.Text>
                 </Card.Body>
                 <Card.Footer>
+                  <p><strong>Tecnologías:</strong> {p.tech}</p>
                   {p.links.github && (
                     <Button variant="primary" size="sm" href={p.links.github} className="me-2">GitHub</Button>
                   )}
