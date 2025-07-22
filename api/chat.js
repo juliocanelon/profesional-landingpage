@@ -70,6 +70,15 @@ export default async function handler(req, res) {
   if (Array.isArray(profileJulio.publications)) {
     kbLines.push(`Publicaciones / Hobbies: ${profileJulio.publications.join(', ')}`);
   }
+  if (Array.isArray(profileJulio.experience)) {
+    kbLines.push(`Experiencia profesional: ${profileJulio.experience.join(', ')}`);
+  }
+  if (Array.isArray(profileJulio.academicExperience)) {
+    kbLines.push(`Experiencia academica: ${profileJulio.academicExperience.join(', ')}`);
+  }
+  if (Array.isArray(profileJulio.talks)) {
+    kbLines.push(`Charlas y ponencias: ${profileJulio.talks.join(', ')}`);
+  }
 
   const systemPrompt = `
 Eres "Chatbot Julio Canelon IA".  
