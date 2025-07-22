@@ -1,10 +1,10 @@
 // Si usas Next.js, crea: /pages/api/chat.js
 // Si usas Vercel sin Next, crea: /api/chat.js
 
-import { skills }    from '../data/skills.js';
-import { education } from '../../src/data/education.js';
-import { projects }  from '../../src/data/projects.js';
-import { contact }   from '../../src/data/contact.js';
+import { skills }    from '../src/data/skills.js';
+import { education } from '../src/data/education.js';
+import { projects }  from '../src/data/projects.js';
+import { contact }   from '../src/data/contact.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
