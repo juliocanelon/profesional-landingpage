@@ -1,142 +1,101 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Button, Form, InputGroup } from 'react-bootstrap';
-import { FaComments, FaPaperPlane } from 'react-icons/fa';
+// pages/api/chat.js
 
-function ChatBot() {
-  const [messages, setMessages] = useState([]);          // { role, text }
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [show, setShow] = useState(false);
-  const scrollRef = useRef(null);
+import { skills } from '../data/skills.js';
+import { education } from '../data/education.js';
+import { projects } from '../data/projects.js';
+import { contact } from '../data/contact.js';
 
-  const handleShow = () => setShow(true);
-  const handleClose = () => setShow(false);
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-  // Mantener el scroll siempre abajo cuando llegan nuevos mensajes
-  const scrollToBottom = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  // Leer el prompt del body
+  let body = '';
+  for await (const chunk of req) {
+    body += chunk;
+  }
+  let prompt;
+  try {
+    ({ prompt } = JSON.parse(body || '{}'));
+  } catch {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Missing OPENAI_API_KEY' });
+  }
+
+  // Construye la KB a partir de tus datos
+  function buildKnowledgeBase() {
+    const lines = [];
+
+    lines.push('=== HABILIDADES ===');
+    Object.entries(skills).forEach(([category, items]) => {
+      lines.push(`${category}: ${items.join(', ')}`);
+    });
+
+    lines.push('\n=== EDUCACIÓN ===');
+    education.forEach((entry) => {
+      lines.push(`- ${entry}`);
+    });
+
+    lines.push('\n=== PROYECTOS ===');
+    projects.forEach((p) => {
+      lines.push(`- ${p.title} (${p.role}): ${p.description}`);
+    });
+
+    lines.push('\n=== CONTACTO ===');
+    lines.push(`Email: ${contact.email}`);
+    lines.push(`LinkedIn: ${contact.linkedin}`);
+    lines.push(`GitHub: ${contact.github}`);
+
+    return lines.join('\n');
+  }
+
+  const knowledgeBase = buildKnowledgeBase();
+
+  // Mensajes para OpenAI: primero el sistema con la KB, luego el usuario
+  const messages = [
+    {
+      role: 'system',
+      content: `
+Eres "Chatbot Julio Canelon IA".  
+Sólo puedes usar la siguiente información para responder.  
+Si la pregunta no está en estos datos, responde: "Lo siento, no dispongo de esa información."  
+
+${knowledgeBase}
+      `.trim()
+    },
+    { role: 'user', content: prompt }
+  ];
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages,
+        temperature: 0
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText);
     }
-  };
 
-  useEffect(() => {
-    if (show) scrollToBottom();
-  }, [messages, show]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-
-    const userMsg = { role: 'user', text: input };
-    setMessages((msgs) => [...msgs, userMsg]);
-    setLoading(true);
-    setError(null);
-    setInput('');
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: input }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Error del servidor');
-      }
-      if (data.reply) {
-        setMessages((msgs) => [...msgs, { role: 'assistant', text: data.reply }]);
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <>
-      {/* Botón flotante para abrir el chat */}
-      <Button
-        variant="primary"
-        onClick={handleShow}
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          borderRadius: '50%',
-          width: '60px',
-          height: '60px',
-          padding: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-        }}
-      >
-        <FaComments size={24} />
-      </Button>
-
-      {/* Modal del chatbot */}
-      <Modal show={show} onHide={handleClose} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Chatbot Julio Canelon IA</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body
-          ref={scrollRef}
-          style={{ maxHeight: '60vh', overflowY: 'auto', padding: '1rem' }}
-        >
-          {/* Mensaje de bienvenida */}
-          {messages.length === 0 && (
-            <div className="mb-3">
-              <div className="p-2 rounded bg-light text-dark">
-                ¡Hola! Soy tu Chatbot Julio Canelon IA. Pregúntame sobre mi experiencia en desarrollo de software, inteligencia artificial, liderazgo técnico y más.
-              </div>
-            </div>
-          )}
-
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`mb-2 d-flex ${
-                msg.role === 'user' ? 'justify-content-end' : 'justify-content-start'
-              }`}
-            >
-              <div
-                className={`p-2 rounded ${
-                  msg.role === 'user' ? 'bg-primary text-white' : 'bg-light text-dark'
-                }`}
-                style={{ maxWidth: '80%' }}
-              >
-                {msg.text}
-              </div>
-            </div>
-          ))}
-
-          {error && <div className="text-danger">Error: {error}</div>}
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Form className="w-100" onSubmit={handleSubmit}>
-            <InputGroup>
-              <Form.Control
-                placeholder="Escribe tu mensaje..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={loading}
-              />
-              <Button variant="primary" type="submit" disabled={loading || !input.trim()}>
-                <FaPaperPlane />
-              </Button>
-            </InputGroup>
-          </Form>
-        </Modal.Footer>
-      </Modal>
-    </>
-  );
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || '';
+    return res.status(200).json({ reply });
+  } catch (error) {
+    console.error('OpenAI error:', error);
+    return res.status(500).json({ error: error.message || 'Server error' });
+  }
 }
-
-export default ChatBot;
