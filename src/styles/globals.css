@@ -22,3 +22,32 @@ body {
   width: 1em;
   margin-left: -1em;
 }
+
+.chat-window {
+  max-height: 400px;
+  overflow-y: auto;
+}
+.msg {
+  padding: .5rem;
+  margin: .3rem 0;
+  border-radius: .3rem;
+}
+.msg.user {
+  background: #e0f7fa;
+  text-align: right;
+}
+.msg.bot {
+  background: #f1f1f1;
+}
+.msg.error {
+  background: #ffe5e5;
+  color: #b00020;
+}
+form {
+  display: flex;
+  gap: .5rem;
+  margin-top: .5rem;
+}
+input {
+  flex: 1;
+}

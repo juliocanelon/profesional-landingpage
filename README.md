@@ -7,6 +7,17 @@ cd landing-page
 npm install
 ```
 
+Crea un archivo `.env.local` en la raíz con tu clave de OpenAI:
+
+```bash
+OPENAI_API_KEY=TU_API_KEY_AQUI
+```
+
+Si despliegas en Vercel y la ruta `/api/chat` devuelve `500`, revisa que la
+variable `OPENAI_API_KEY` esté configurada en el panel de **Environment
+Variables**. También puedes ejecutar `vercel logs` para obtener más detalles
+del error.
+
 ## Desarrollo
 ```bash
 npm start
